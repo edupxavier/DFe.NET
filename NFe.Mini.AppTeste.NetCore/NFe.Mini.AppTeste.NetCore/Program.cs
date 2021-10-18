@@ -16,10 +16,12 @@ namespace NFe.Mini.AppTeste.NetCore
             int ok = 0, erro = 0;
             foreach (var arq in arqs)
             {
+                Classes.NFe nfe = null;
                 try
                 {
                     string xml = File.ReadAllText(arq);
                     Console.WriteLine($" - {Path.GetFileName(arq)}");
+                    nfe = MiniExts.CarregaNFe(xml);
                     ok++;
                 }
                 catch (Exception ex)
@@ -27,9 +29,27 @@ namespace NFe.Mini.AppTeste.NetCore
                     Console.WriteLine($" - {Path.GetFileName(arq)}: ERRO");
                     Console.WriteLine($"   {ex.GetType().Name}: {ex.Message}");
                     erro++;
+                    continue;
                 }
+
+
+
+                string arquivoPDF = Path.Combine(dir, "Danfe", Path.GetFileNameWithoutExtension(arq) + ".pdf");
+                try
+                {
+                    MiniExts.GerarDanfePdf(nfe, arquivoPDF);
+                    Console.WriteLine($"   {Path.GetFileName(arquivoPDF)}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"   Erro gerando PDF:");
+                    Console.WriteLine($"   {ex.GetType().Name}: {ex.Message}");
+                    erro++;
+                }
+
+
             }
-            Console.WriteLine($"\n\n{arqs} arquivos, {ok} ok, {erro} com erro");
+            Console.WriteLine($"\n\n{arqs.Length} arquivos, {ok} ok, {erro} com erro");
         }
     }
 }
